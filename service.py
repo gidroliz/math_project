@@ -1,6 +1,6 @@
 from dotenv import dotenv_values
 import pymysql
-from generator import generator
+from modules.generator import generator
 
 secrets = dotenv_values(".env")
 

@@ -4,6 +4,7 @@ import json
 import pymysql
 from main import main
 from dotenv import dotenv_values
+from modules.sql_querys import sql_verify_token
 
 secrets = dotenv_values(".env")
 
@@ -23,8 +24,7 @@ def verify_token(token):
         return None, True
     else:
         with connection.cursor() as cursor:
-            sql = f"""SELECT id FROM math_user WHERE token='{token}' LIMIT 1;"""
-            cursor.execute(sql)
+            cursor.execute(sql_verify_token.format(token))
             result = cursor.fetchone()
             if result:
                 return result["id"], True
@@ -33,13 +33,6 @@ def verify_token(token):
 
 
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        message = "<font size=+3>Hello world!</font><p>"
-        self.wfile.write(bytes(message, "utf8"))
 
     def do_POST(self):
         content_length = int(self.headers["Content-Length"])
