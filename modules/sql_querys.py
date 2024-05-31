@@ -59,3 +59,4 @@ sql_get_achievements = """
     WHERE 
         mu.id = %s;
 """
+sql_check_tasks='''SELECT COUNT(*) from math_tasks'''

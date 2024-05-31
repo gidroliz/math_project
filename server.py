@@ -4,7 +4,9 @@ import json
 import pymysql
 from main import main
 from dotenv import dotenv_values
-from modules.sql_querys import sql_verify_token
+from modules.migrate import make_migration
+from modules.service import generate_table
+from modules.sql_querys import sql_verify_token, sql_check_tasks
 
 secrets = dotenv_values(".env")
 
@@ -18,6 +20,12 @@ connection = pymysql.connections.Connection(
     cursorclass=pymysql.cursors.DictCursor,
 )
 
+def check_tasks():
+    with connection.cursor() as cursor:
+        cursor.execute(sql_check_tasks)
+        result = cursor.fetchone()
+    if result['COUNT(*)']==0:
+        generate_table(connection)
 
 def verify_token(token):
     if token == secrets["HARD_TOKEN"]:
@@ -57,6 +65,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
 
 def run():
+    make_migration()
+    check_tasks()
     print("starting server...")
     server_address = ("", 5656)
     httpd = HTTPServer(server_address, testHTTPServer_RequestHandler)
